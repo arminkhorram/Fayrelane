@@ -126,7 +126,7 @@ const startServer = async () => {
     console.log('====================================');
     console.log('📡 STARTING SERVER...');
     console.log('====================================');
-    
+
     try {
         const PORT = process.env.PORT || 5000;
         console.log(`🔧 Using port: ${PORT}`);
