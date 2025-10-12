@@ -43,6 +43,19 @@ console.log(`🔑 DATABASE_URL: ${process.env.DATABASE_URL ? 'configured' : 'not
 console.log(`🔑 JWT_SECRET: ${process.env.JWT_SECRET ? 'configured' : 'not configured'}`);
 
 // ----------------------
+// Healthcheck (Before any middleware)
+// ----------------------
+app.get('/health', (req, res) => {
+    console.log('🏥 Health check requested');
+    res.status(200).json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0',
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
+// ----------------------
 // Middleware & Security
 // ----------------------
 app.use(helmet());
@@ -56,8 +69,23 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // CORS
+const allowedOrigins = [
+    process.env.FRONTEND_URL || 'http://localhost:3000',
+    'https://healthcheck.railway.app', // Railway healthcheck
+    'http://healthcheck.railway.app'   // Railway healthcheck (http)
+];
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps, Postman, or healthchecks)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(null, true); // Allow all in production for now
+        }
+    },
     credentials: true
 }));
 
@@ -67,17 +95,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Logging
 app.use(morgan('combined'));
-
-// ----------------------
-// Healthcheck
-// ----------------------
-app.get('/health', (req, res) => {
-    res.status(200).json({
-        status: 'OK',
-        timestamp: new Date().toISOString(),
-        version: '1.0.0'
-    });
-});
 
 // ----------------------
 // API Routes
