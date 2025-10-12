@@ -6,9 +6,16 @@
                     "nodejs_18"
                 ]
             },
+            "install": {
+                "cmds": [
+                    "npm install",
+                    "cd server && npm install",
+                    "cd client && npm install"
+                ]
+            },
             "build": {
                 "cmds": [
-                    "node build-client.js"
+                    "cd client && npm run build"
                 ]
             },
             "start": {
