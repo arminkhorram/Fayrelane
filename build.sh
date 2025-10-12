@@ -2,13 +2,13 @@
 set -e
 
 echo "🚀 Installing root dependencies..."
-npm ci
+npm ci || npm install
 
 echo "📦 Installing client dependencies..."
 cd client
 npm install
 
 echo "🏗️ Building Next.js client..."
-npm run build
+npx next build
 
 echo "✅ Build complete!"
