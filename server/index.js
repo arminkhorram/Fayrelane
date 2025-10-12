@@ -1,4 +1,12 @@
+console.log('====================================');
+console.log('🚀 FAYRELANE SERVER STARTING...');
+console.log('====================================');
+console.log('Node version:', process.version);
+console.log('Working directory:', process.cwd());
+console.log('====================================');
+
 // Core dependencies
+console.log('🔧 Loading core dependencies...');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -6,8 +14,16 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
+console.log('✅ Core dependencies loaded');
+
+// Config
+console.log('🔧 Loading configuration...');
+const { connectDB } = require('./config/database');
+const { initializeSocket } = require('./config/socket');
+console.log('✅ Configuration loaded');
 
 // Routes
+console.log('🔧 Loading routes...');
 const authRoutes = require('./routes/auth');
 const listingRoutes = require('./routes/listings');
 const messageRoutes = require('./routes/messages');
@@ -15,14 +31,16 @@ const paymentRoutes = require('./routes/payments');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
 const shippingRoutes = require('./routes/shipping');
-
-// Config
-const { connectDB } = require('./config/database');
-const { initializeSocket } = require('./config/socket');
+console.log('✅ All routes loaded');
 
 // Initialize app
+console.log('🔧 Initializing Express app...');
 const app = express();
 const PORT = process.env.PORT || 5000;
+console.log(`✅ Express app initialized. Port: ${PORT}`);
+console.log(`📊 NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
+console.log(`🔑 DATABASE_URL: ${process.env.DATABASE_URL ? 'configured' : 'not configured'}`);
+console.log(`🔑 JWT_SECRET: ${process.env.JWT_SECRET ? 'configured' : 'not configured'}`);
 
 // ----------------------
 // Middleware & Security
@@ -105,11 +123,17 @@ if (process.env.NODE_ENV === 'production') {
 // Start Server
 // ----------------------
 const startServer = async () => {
+    console.log('====================================');
+    console.log('📡 STARTING SERVER...');
+    console.log('====================================');
+    
     try {
         const PORT = process.env.PORT || 5000;
+        console.log(`🔧 Using port: ${PORT}`);
 
         // Try to connect to database, but don't fail if it's not available
         if (process.env.DATABASE_URL) {
+            console.log('🔧 Attempting database connection...');
             try {
                 await connectDB();
             } catch (error) {
@@ -120,20 +144,41 @@ const startServer = async () => {
             console.warn('⚠️  DATABASE_URL not configured. Database features will not be available.');
         }
 
+        console.log(`🔧 Starting Express server on 0.0.0.0:${PORT}...`);
         const server = app.listen(PORT, '0.0.0.0', () => {
+            console.log('====================================');
+            console.log(`✅ SERVER SUCCESSFULLY STARTED!`);
             console.log(`🚀 Server running on port ${PORT}`);
             console.log(`📊 Environment: ${process.env.NODE_ENV}`);
-            console.log(`🏥 Health check available at /health`);
+            console.log(`🏥 Health check: http://0.0.0.0:${PORT}/health`);
+            console.log('====================================');
         });
 
         // Initialize Socket.IO
-        initializeSocket(server);
+        console.log('🔧 Initializing Socket.IO...');
+        try {
+            if (process.env.JWT_SECRET) {
+                initializeSocket(server);
+                console.log('✅ Socket.IO initialized');
+            } else {
+                console.warn('⚠️  JWT_SECRET not set. Socket.IO features disabled.');
+            }
+        } catch (error) {
+            console.warn('⚠️  Socket.IO initialization failed:', error.message);
+            console.warn('⚠️  Real-time messaging will not work');
+        }
     } catch (error) {
-        console.error('❌ Failed to start server:', error);
+        console.error('====================================');
+        console.error('❌ FATAL ERROR: Failed to start server');
+        console.error('====================================');
+        console.error('Error details:', error);
+        console.error('Stack trace:', error.stack);
+        console.error('====================================');
         process.exit(1);
     }
 };
 
+console.log('🔧 Calling startServer()...');
 startServer();
 
 module.exports = app;
