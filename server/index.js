@@ -79,6 +79,9 @@ app.use('*', (req, res) => {
 const startServer = async () => {
     try {
         await connectDB();
+
+        const PORT = process.env.PORT || 3000; // Added this line
+
         const server = app.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`);
             console.log(`📊 Environment: ${process.env.NODE_ENV}`);
