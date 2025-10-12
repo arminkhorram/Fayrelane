@@ -8,8 +8,7 @@
             },
             "build": {
                 "cmds": [
-                    "chmod +x ./build.sh",
-                    "./build.sh"
+                    "node build-client.js"
                 ]
             },
             "start": {
