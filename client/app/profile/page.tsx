@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { EditIcon, SettingsIcon, LogoutIcon } from '@/components/Icons'
+import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { getInitials } from '@/lib/utils'
 
 export default function ProfilePage() {
@@ -18,6 +19,12 @@ export default function ProfilePage() {
         email: user?.email || '',
     })
 
+    useEffect(() => {
+        if (!user) {
+            router.push('/login')
+        }
+    }, [user, router])
+
     const handleLogout = () => {
         logout()
         router.push('/')
@@ -29,8 +36,11 @@ export default function ProfilePage() {
     }
 
     if (!user) {
-        router.push('/login')
-        return null
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <LoadingSpinner size="lg" />
+            </div>
+        )
     }
 
     return (

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useQuery } from 'react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { api } from '@/lib/api'
@@ -30,7 +30,7 @@ interface Listing {
     createdAt: string
 }
 
-export default function ListingsPage() {
+function ListingsContent() {
     const [favorites, setFavorites] = useState<Set<string>>(new Set())
     const [showFilters, setShowFilters] = useState(false)
     const [filters, setFilters] = useState({
@@ -418,7 +418,15 @@ export default function ListingsPage() {
     )
 }
 
-
-
-
+export default function ListingsPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <LoadingSpinner size="lg" />
+            </div>
+        }>
+            <ListingsContent />
+        </Suspense>
+    )
+}
 

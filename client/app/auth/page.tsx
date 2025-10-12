@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { EyeIcon, EyeOffIcon } from '@/components/Icons'
 
-export default function AuthPage() {
+function AuthContent() {
     const [isLogin, setIsLogin] = useState(true)
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
@@ -395,5 +395,17 @@ export default function AuthPage() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function AuthPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <LoadingSpinner size="lg" />
+            </div>
+        }>
+            <AuthContent />
+        </Suspense>
     )
 }
