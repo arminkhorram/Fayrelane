@@ -1,0 +1,30 @@
+{
+    "name": "fayrelane-mvp",
+    "version": "1.0.0",
+    "description": "Fayrelane MVP Phase 1 - Automotive Marketplace Platform",
+    "main": "server/index.js",
+    "scripts": {
+        "dev": "concurrently \"npm run server\" \"npm run client\"",
+        "server": "cd server && npm run dev",
+        "client": "cd client && npm run dev",
+        "build": "cd client && npm run build",
+        "start": "cd server && npm start",
+        "install-all": "npm install && cd server && npm install && cd ../client && npm install",
+        "migrate": "cd server && npm run migrate",
+        "seed": "cd server && npm run seed",
+        "setup": "npm run install-all && npm run migrate && npm run seed",
+        "deploy:backend": "cd server && npm run build",
+        "deploy:frontend": "cd client && npm run build"
+    },
+    "keywords": [
+        "marketplace",
+        "automotive",
+        "ecommerce",
+        "mvp"
+    ],
+    "author": "Fayrelane Team",
+    "license": "MIT",
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}
