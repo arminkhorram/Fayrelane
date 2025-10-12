@@ -1,11 +1,4 @@
 {
-    "build": "cd client && npm install && npm run build",
-    "start": "cd server && npm start",
-    "deploy": {
-        "healthcheckPath": "/",
-        "restartPolicyType": "ON_FAILURE",
-        "sleep": false
-    },
     "nixpacks": {
         "phases": {
             "install": {
@@ -23,6 +16,11 @@
                 "cmd": "cd server && npm start"
             }
         }
+    },
+    "deploy": {
+        "healthcheckPath": "/",
+        "restartPolicyType": "ON_FAILURE",
+        "sleep": false
     },
     "env": {
         "NODE_ENV": "production"
