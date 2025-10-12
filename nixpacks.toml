@@ -1,17 +1,9 @@
 [phases.setup]
 nixPkgs = ["nodejs_18"]
 
-[phases.install]
-cmds = [
-    "npm install --omit=dev --prefix ./server",
-    "npm install --prefix ./client"
-]
-
 [phases.build]
-cmds = [
-    "npm run build --prefix ./client"
-]
+cmds = ["bash railway-build.sh"]
 
 [start]
-cmd = "cd server && npm start"
+cmd = "cd server && node index.js"
 

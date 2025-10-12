@@ -24,7 +24,7 @@
         }
     },
     "deploy": {
-        "healthcheckPath": "/",
+        "healthcheckPath": "/health",
         "restartPolicyType": "ON_FAILURE",
         "sleep": false
     },
