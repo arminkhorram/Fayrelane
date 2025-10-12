@@ -15,7 +15,8 @@
         "seed": "cd server && npm run seed",
         "setup": "npm run install-all && npm run migrate && npm run seed",
         "deploy:backend": "cd server && npm run build",
-        "deploy:frontend": "cd client && npm run build"
+        "deploy:frontend": "cd client && npm run build",
+        "heroku-postbuild": "npm run install-client && npm run build"
     },
     "keywords": [
         "marketplace",

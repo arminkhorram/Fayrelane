@@ -106,19 +106,30 @@ if (process.env.NODE_ENV === 'production') {
 // ----------------------
 const startServer = async () => {
     try {
-        await connectDB();
+        const PORT = process.env.PORT || 5000;
 
-        const PORT = process.env.PORT || 3000;
+        // Try to connect to database, but don't fail if it's not available
+        if (process.env.DATABASE_URL) {
+            try {
+                await connectDB();
+            } catch (error) {
+                console.warn('⚠️  Database connection failed, but server will continue:', error.message);
+                console.warn('⚠️  Database-dependent features will not work until DATABASE_URL is configured');
+            }
+        } else {
+            console.warn('⚠️  DATABASE_URL not configured. Database features will not be available.');
+        }
 
-        const server = app.listen(PORT, () => {
+        const server = app.listen(PORT, '0.0.0.0', () => {
             console.log(`🚀 Server running on port ${PORT}`);
             console.log(`📊 Environment: ${process.env.NODE_ENV}`);
+            console.log(`🏥 Health check available at /health`);
         });
 
         // Initialize Socket.IO
         initializeSocket(server);
     } catch (error) {
-        console.error('Failed to start server:', error);
+        console.error('❌ Failed to start server:', error);
         process.exit(1);
     }
 };
