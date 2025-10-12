@@ -2,7 +2,7 @@
 nixPkgs = ["nodejs_18"]
 
 [phases.build]
-cmds = ["bash railway-build.sh"]
+cmds = ["chmod +x railway-build.sh && ./railway-build.sh"]
 
 [start]
 cmd = "cd server && node index.js"
