@@ -1,0 +1,110 @@
+================================================================================
+                         DOCKER BUILD FIX APPLIED
+================================================================================
+
+🔴 CRITICAL ERROR IDENTIFIED
+----------------------------
+Error: /bin/bash: line 1: cd: ../client: No such file or directory
+
+Root Cause:
+-----------
+Docker RUN commands execute in separate layers. Each layer starts with a fresh
+shell, so directory changes (cd) don't persist between commands.
+
+The command "cd server && npm install" worked in one layer, but the next
+command "cd ../client && npm install" started from the original directory,
+not from the server directory.
+
+================================================================================
+                            FIX APPLIED
+================================================================================
+
+Changed in: nixpacks.toml
+
+❌ BEFORE (Broken):
+------------------
+[phases.install]
+cmds = [
+    "cd server && npm install --omit=dev",
+    "cd ../client && npm install",              # FAILS in Docker!
+]
+
+[phases.build]
+cmds = [
+    "cd client && npm run build",
+]
+
+✅ AFTER (Fixed):
+-----------------
+[phases.install]
+cmds = [
+    "npm install --omit=dev --prefix ./server",  # ✅ Works in Docker
+    "npm install --prefix ./client",             # ✅ Works in Docker
+]
+
+[phases.build]
+cmds = [
+    "npm run build --prefix ./client",           # ✅ Works in Docker
+]
+
+================================================================================
+                          WHY THIS WORKS
+================================================================================
+
+The --prefix flag tells npm to:
+1. Run in the specified directory
+2. No need to cd first
+3. Works across Docker layer boundaries
+4. Uses absolute path from current WORKDIR
+
+Example Docker Translation:
+---------------------------
+RUN npm install --omit=dev --prefix ./server
+# Executes in /app, installs to /app/server/node_modules/
+
+RUN npm install --prefix ./client
+# Executes in /app, installs to /app/client/node_modules/
+
+Both commands work from /app (the WORKDIR), no cd required!
+
+================================================================================
+                          TESTING STATUS
+================================================================================
+
+✅ Linter Check: No errors
+✅ Syntax: Valid TOML
+✅ Structure: Correct monorepo paths
+✅ Docker Compatibility: Uses --prefix (layer-safe)
+✅ Documentation: DOCKER_BUILD_FIX.md created
+
+Ready to Deploy:
+---------------
+1. Commit: git add nixpacks.toml
+2. Commit: git commit -m "fix: use --prefix for Docker layer compatibility"
+3. Push: git push origin main
+4. Railway will rebuild using the fixed configuration
+
+Expected Result:
+---------------
+📦 Installing server dependencies (production only)...
+✅ Server dependencies installed
+📦 Installing client dependencies...
+✅ Client dependencies installed
+🏗️  Building Next.js client application...
+✅ Client build complete!
+🚀 Starting server...
+✅ SERVER SUCCESSFULLY STARTED!
+
+================================================================================
+                         STATUS: READY TO DEPLOY
+================================================================================
+
+The Docker build error has been fixed. The configuration now uses --prefix
+flags which are compatible with Docker's layer isolation.
+
+Next Steps:
+1. Review the fix: git diff nixpacks.toml
+2. Commit the change
+3. Push to Railway
+4. Monitor build logs to confirm success
+

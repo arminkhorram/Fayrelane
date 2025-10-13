@@ -10,12 +10,13 @@ nixPkgs = ["nodejs_18"]
 [phases.install]
 # Install dependencies for both server and client
 # This phase is cached by Nixpacks for faster subsequent builds
+# Note: Using --prefix to avoid directory navigation issues in Docker layers
 cmds = [
     "echo '📦 Installing server dependencies (production only)...'",
-    "cd server && npm install --omit=dev",
+    "npm install --omit=dev --prefix ./server",
     "echo '✅ Server dependencies installed'",
     "echo '📦 Installing client dependencies...'",
-    "cd ../client && npm install",
+    "npm install --prefix ./client",
     "echo '✅ Client dependencies installed'"
 ]
 
@@ -24,7 +25,7 @@ cmds = [
 # Server has no build step (runs directly with node)
 cmds = [
     "echo '🏗️  Building Next.js client application...'",
-    "cd client && npm run build",
+    "npm run build --prefix ./client",
     "echo '✅ Client build complete!'"
 ]
 
