@@ -1,34 +1,13 @@
 {
-    "nixpacks": {
-        "phases": {
-            "setup": {
-                "nixPkgs": [
-                    "nodejs_18"
-                ]
-            },
-            "install": {
-                "cmds": [
-                    "npm install",
-                    "cd server && npm install",
-                    "cd client && npm install"
-                ]
-            },
-            "build": {
-                "cmds": [
-                    "cd client && npm run build"
-                ]
-            },
-            "start": {
-                "cmd": "cd server && npm start"
-            }
-        }
-    },
+    "$schema": "https://railway.app/railway.schema.json",
     "deploy": {
         "healthcheckPath": "/health",
+        "healthcheckTimeout": 100,
         "restartPolicyType": "ON_FAILURE",
-        "sleep": false
+        "restartPolicyMaxRetries": 10,
+        "sleepApplication": false
     },
-    "env": {
-        "NODE_ENV": "production"
+    "build": {
+        "builder": "NIXPACKS"
     }
 }

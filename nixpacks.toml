@@ -1,9 +1,35 @@
+# ==============================================
+# Nixpacks Configuration for Fayrelane
+# Optimized for Railway deployment with monorepo structure
+# ==============================================
+
 [phases.setup]
+# Use Node.js 18 (LTS) for compatibility
 nixPkgs = ["nodejs_18"]
 
+[phases.install]
+# Install dependencies for both server and client
+# This phase is cached by Nixpacks for faster subsequent builds
+cmds = [
+    "echo '📦 Installing server dependencies (production only)...'",
+    "cd server && npm install --omit=dev",
+    "echo '✅ Server dependencies installed'",
+    "echo '📦 Installing client dependencies...'",
+    "cd ../client && npm install",
+    "echo '✅ Client dependencies installed'"
+]
+
 [phases.build]
-cmds = ["chmod +x railway-build.sh && ./railway-build.sh"]
+# Build the Next.js client for production
+# Server has no build step (runs directly with node)
+cmds = [
+    "echo '🏗️  Building Next.js client application...'",
+    "cd client && npm run build",
+    "echo '✅ Client build complete!'"
+]
 
 [start]
-cmd = "chmod +x start.sh && ./start.sh"
+# Start the Express server
+# Server serves both API and built client in production
+cmd = "cd server && node index.js"
 

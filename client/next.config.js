@@ -1,6 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Export as standalone static site for Express to serve
+    output: 'export',
+    distDir: 'dist',
+
     images: {
+        // Use unoptimized images for static export
+        unoptimized: true,
         domains: ['localhost', 'your-s3-bucket.s3.amazonaws.com'],
         remotePatterns: [
             {
