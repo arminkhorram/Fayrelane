@@ -37,6 +37,7 @@ console.log('✅ All routes loaded');
 console.log('🔧 Initializing Express app...');
 const app = express();
 const PORT = process.env.PORT || 5000;
+const SERVER_START_TIME = Date.now(); // Track server start time for uptime
 console.log(`✅ Express app initialized. Port: ${PORT}`);
 console.log(`📊 NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
 console.log(`🔑 DATABASE_URL: ${process.env.DATABASE_URL ? 'configured' : 'not configured'}`);
@@ -46,12 +47,11 @@ console.log(`🔑 JWT_SECRET: ${process.env.JWT_SECRET ? 'configured' : 'not con
 // Healthcheck (Before any middleware)
 // ----------------------
 app.get('/health', (req, res) => {
-    console.log('🏥 Health check requested');
+    const uptime = Math.floor((Date.now() - SERVER_START_TIME) / 1000);
     res.status(200).json({
-        status: 'OK',
-        timestamp: new Date().toISOString(),
-        version: '1.0.0',
-        environment: process.env.NODE_ENV || 'development'
+        status: 'ok',
+        uptime: uptime,
+        timestamp: new Date().toISOString()
     });
 });
 
