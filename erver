@@ -1,0 +1,29 @@
+[1mdiff --git a/nixpacks.toml b/nixpacks.toml[m
+[1mindex b238b0b..37ec8c1 100644[m
+[1m--- a/nixpacks.toml[m
+[1m+++ b/nixpacks.toml[m
+[36m@@ -10,12 +10,13 @@[m [mnixPkgs = ["nodejs_18"][m
+ [phases.install][m
+ # Install dependencies for both server and client[m
+ # This phase is cached by Nixpacks for faster subsequent builds[m
+[32m+[m[32m# Note: Using --prefix to avoid directory navigation issues in Docker layers[m
+ cmds = [[m
+     "echo '📦 Installing server dependencies (production only)...'",[m
+[31m-    "cd server && npm install --omit=dev",[m
+[32m+[m[32m    "npm install --omit=dev --prefix ./server",[m
+     "echo '✅ Server dependencies installed'",[m
+     "echo '📦 Installing client dependencies...'",[m
+[31m-    "cd ../client && npm install",[m
+[32m+[m[32m    "npm install --prefix ./client",[m
+     "echo '✅ Client dependencies installed'"[m
+ ][m
+ [m
+[36m@@ -24,7 +25,7 @@[m [mcmds = [[m
+ # Server has no build step (runs directly with node)[m
+ cmds = [[m
+     "echo '🏗️  Building Next.js client application...'",[m
+[31m-    "cd client && npm run build",[m
+[32m+[m[32m    "npm run build --prefix ./client",[m
+     "echo '✅ Client build complete!'"[m
+ ][m
+ [m

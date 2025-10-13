@@ -1,20 +1,25 @@
 const express = require('express');
 const multer = require('multer');
-const AWS = require('aws-sdk');
+// MIGRATED: AWS SDK v2 → v3 (2025-10-13)
+// Old: const AWS = require('aws-sdk');
+// New: Using modular @aws-sdk/client-s3 for better performance and smaller bundle size
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { query } = require('../config/database');
 const { authenticateToken, requireSeller, optionalAuth } = require('../middleware/auth');
 const { validateListing, validateId, validatePagination } = require('../middleware/validation');
 
 const router = express.Router();
 
-// Configure AWS S3
-AWS.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION
+// Configure AWS S3 Client (v3)
+// MIGRATED: AWS SDK v2 config → v3 client initialization
+// v3 uses a more modular approach with explicit client configuration
+const s3Client = new S3Client({
+    region: process.env.AWS_REGION || 'us-east-1',
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    }
 });
-
-const s3 = new AWS.S3();
 
 // Configure multer for file uploads
 const upload = multer({
@@ -32,17 +37,32 @@ const upload = multer({
 });
 
 // Upload image to S3
+// MIGRATED: AWS SDK v2 s3.upload() → v3 PutObjectCommand (2025-10-13)
+// v3 uses command-based architecture for better tree-shaking and modularity
 const uploadToS3 = async (file, folder = 'listings') => {
-    const params = {
-        Bucket: process.env.AWS_S3_BUCKET,
-        Key: `${folder}/${Date.now()}-${file.originalname}`,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-        ACL: 'public-read'
-    };
+    try {
+        const key = `${folder}/${Date.now()}-${file.originalname}`;
+        const params = {
+            Bucket: process.env.AWS_S3_BUCKET,
+            Key: key,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+            ACL: 'public-read'
+        };
 
-    const result = await s3.upload(params).promise();
-    return result.Location;
+        // v3 uses client.send(new Command(params)) pattern
+        await s3Client.send(new PutObjectCommand(params));
+
+        // Construct the URL manually (v3 doesn't return Location by default)
+        const region = process.env.AWS_REGION || 'us-east-1';
+        const bucket = process.env.AWS_S3_BUCKET;
+        const location = `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
+
+        return location;
+    } catch (error) {
+        console.error('S3 upload error:', error);
+        throw new Error(`Failed to upload image to S3: ${error.message}`);
+    }
 };
 
 // Get all listings with filters and pagination
