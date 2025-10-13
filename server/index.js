@@ -22,16 +22,46 @@ const { connectDB } = require('./config/database');
 const { initializeSocket } = require('./config/socket');
 console.log('✅ Configuration loaded');
 
-// Routes
+// Routes - Load with detailed error handling
 console.log('🔧 Loading routes...');
-const authRoutes = require('./routes/auth');
-const listingRoutes = require('./routes/listings');
-const messageRoutes = require('./routes/messages');
-const paymentRoutes = require('./routes/payments');
-const userRoutes = require('./routes/users');
-const adminRoutes = require('./routes/admin');
-const shippingRoutes = require('./routes/shipping');
-console.log('✅ All routes loaded');
+let authRoutes, listingRoutes, messageRoutes, paymentRoutes, userRoutes, adminRoutes, shippingRoutes;
+
+try {
+    authRoutes = require('./routes/auth');
+    console.log('  ✅ Auth routes loaded');
+} catch (error) {
+    console.error('❌ Failed to load auth routes:', error.message);
+    process.exit(1);
+}
+
+try {
+    listingRoutes = require('./routes/listings');
+    console.log('  ✅ Listing routes loaded');
+} catch (error) {
+    console.error('❌ Failed to load listing routes:', error.message);
+    console.error('💡 This may be due to missing @aws-sdk/client-s3 package');
+    console.error('💡 Run: npm install @aws-sdk/client-s3');
+    process.exit(1);
+}
+
+try {
+    messageRoutes = require('./routes/messages');
+    console.log('  ✅ Message routes loaded');
+    paymentRoutes = require('./routes/payments');
+    console.log('  ✅ Payment routes loaded');
+    userRoutes = require('./routes/users');
+    console.log('  ✅ User routes loaded');
+    adminRoutes = require('./routes/admin');
+    console.log('  ✅ Admin routes loaded');
+    shippingRoutes = require('./routes/shipping');
+    console.log('  ✅ Shipping routes loaded');
+} catch (error) {
+    console.error('❌ Failed to load routes:', error.message);
+    console.error('Stack:', error.stack);
+    process.exit(1);
+}
+
+console.log('✅ All routes loaded successfully');
 
 // Initialize app
 console.log('🔧 Initializing Express app...');
@@ -194,6 +224,27 @@ const startServer = async () => {
         process.exit(1);
     }
 };
+
+// Global error handlers for better debugging
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('====================================');
+    console.error('❌ UNHANDLED REJECTION');
+    console.error('====================================');
+    console.error('Reason:', reason);
+    console.error('Promise:', promise);
+    console.error('====================================');
+    process.exit(1);
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('====================================');
+    console.error('❌ UNCAUGHT EXCEPTION');
+    console.error('====================================');
+    console.error('Error:', error.message);
+    console.error('Stack:', error.stack);
+    console.error('====================================');
+    process.exit(1);
+});
 
 console.log('🔧 Calling startServer()...');
 startServer();
