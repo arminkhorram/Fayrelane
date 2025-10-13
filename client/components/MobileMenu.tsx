@@ -114,14 +114,14 @@ export function MobileMenu({ user, navigation, onClose }: MobileMenuProps) {
                 ) : (
                     <div className="border-t border-gray-200 pt-4 space-y-1">
                         <Link
-                            href="/auth"
+                            href="/login"
                             onClick={onClose}
                             className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium"
                         >
                             Sign In
                         </Link>
                         <Link
-                            href="/auth"
+                            href="/register"
                             onClick={onClose}
                             className="bg-primary-600 text-white hover:bg-primary-700 block px-3 py-2 rounded-md text-base font-medium text-center"
                         >

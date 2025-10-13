@@ -37,28 +37,12 @@ export function Hero() {
                                 </Link>
                                 <Link
                                     href="/listings"
-                                    className="btn-secondary btn-lg border-white text-white hover:bg-white hover:text-primary-600"
+                                    className="btn-secondary btn-lg border-2 border-white text-white hover:bg-white hover:text-primary-600 transition-all duration-200"
                                 >
                                     Browse Parts
                                 </Link>
                             </>
                         )}
-                    </div>
-                </div>
-
-                {/* Stats */}
-                <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-                    <div className="text-center">
-                        <div className="text-3xl font-bold text-yellow-300">10K+</div>
-                        <div className="text-gray-200">Active Listings</div>
-                    </div>
-                    <div className="text-center">
-                        <div className="text-3xl font-bold text-yellow-300">5K+</div>
-                        <div className="text-gray-200">Happy Customers</div>
-                    </div>
-                    <div className="text-center">
-                        <div className="text-3xl font-bold text-yellow-300">50+</div>
-                        <div className="text-gray-200">Categories</div>
                     </div>
                 </div>
             </div>

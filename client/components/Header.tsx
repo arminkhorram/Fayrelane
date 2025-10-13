@@ -61,13 +61,13 @@ export function Header() {
                         ) : (
                             <div className="flex items-center space-x-4">
                                 <Link
-                                    href="/auth"
+                                    href="/login"
                                     className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                                 >
                                     Sign In
                                 </Link>
                                 <Link
-                                    href="/auth"
+                                    href="/register"
                                     className="btn-primary btn-sm"
                                 >
                                     Sign Up
