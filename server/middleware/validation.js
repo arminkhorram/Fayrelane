@@ -111,7 +111,7 @@ const validateListing = [
 // Message validation
 const validateMessage = [
     body('conversationId')
-        .isUUID()
+        .isInt({ min: 1 })
         .withMessage('Valid conversation ID is required'),
     body('content')
         .trim()
@@ -136,7 +136,7 @@ const validateReview = [
 // ID parameter validation
 const validateId = [
     param('id')
-        .isUUID()
+        .isInt({ min: 1 })
         .withMessage('Valid ID is required'),
     handleValidationErrors
 ];

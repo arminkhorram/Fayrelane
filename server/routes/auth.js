@@ -44,12 +44,15 @@ router.post('/register', validateRegistration, async (req, res) => {
         const saltRounds = 12;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+        // Create full name from first and last name
+        const fullName = `${firstName} ${lastName}`.trim();
+
         // Create user
         const result = await query(
-            `INSERT INTO users (email, password, first_name, last_name, role, is_active, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING id, email, first_name, last_name, role, created_at`,
-            [email, hashedPassword, firstName, lastName, role, true, new Date()]
+            `INSERT INTO users (name, email, password, first_name, last_name, role, is_active, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+       RETURNING id, name, email, first_name, last_name, role, created_at`,
+            [fullName, email, hashedPassword, firstName, lastName, role, true]
         );
 
         const user = result.rows[0];
@@ -65,6 +68,7 @@ router.post('/register', validateRegistration, async (req, res) => {
             message: 'User registered successfully',
             user: {
                 id: user.id,
+                name: user.name,
                 email: user.email,
                 firstName: user.first_name,
                 lastName: user.last_name,
@@ -86,7 +90,7 @@ router.post('/login', validateLogin, async (req, res) => {
 
         // Find user
         const result = await query(
-            'SELECT id, email, password, first_name, last_name, role, is_active FROM users WHERE email = $1',
+            'SELECT id, name, email, password, first_name, last_name, role, is_active FROM users WHERE email = $1',
             [email]
         );
 
@@ -117,6 +121,7 @@ router.post('/login', validateLogin, async (req, res) => {
             message: 'Login successful',
             user: {
                 id: user.id,
+                name: user.name,
                 email: user.email,
                 firstName: user.first_name,
                 lastName: user.last_name,
@@ -222,7 +227,7 @@ router.post('/reset-password', validateResetPassword, async (req, res) => {
 router.get('/me', authenticateToken, async (req, res) => {
     try {
         const result = await query(
-            'SELECT id, email, first_name, last_name, role, created_at FROM users WHERE id = $1',
+            'SELECT id, name, email, first_name, last_name, role, created_at FROM users WHERE id = $1',
             [req.user.id]
         );
 
@@ -233,6 +238,7 @@ router.get('/me', authenticateToken, async (req, res) => {
         const user = result.rows[0];
         res.json({
             id: user.id,
+            name: user.name,
             email: user.email,
             firstName: user.first_name,
             lastName: user.last_name,
