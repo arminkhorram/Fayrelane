@@ -1,9 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // Enable proper client-side routing
-    trailingSlash: false,
+    // Enable static export for Railway deployment
+    output: 'export',
+    trailingSlash: true,
+    distDir: 'out',
 
     images: {
+        // Use unoptimized images for static export
+        unoptimized: true,
         domains: ['localhost', 'your-s3-bucket.s3.amazonaws.com'],
         remotePatterns: [
             {

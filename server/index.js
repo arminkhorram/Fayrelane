@@ -149,16 +149,70 @@ app.use((err, req, res, next) => {
 });
 
 // ----------------------
-// Serve React build (for production)
+// Serve Next.js static export (for production)
 // ----------------------
 if (process.env.NODE_ENV === 'production') {
-    // Serve frontend static files
-    app.use(express.static(path.join(__dirname, '..', 'client', 'dist')));
+    console.log('🔧 Setting up static file serving for production...');
 
-    // Send all other routes to React index.html
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'client', 'dist', 'index.html'));
-    });
+    // Serve Next.js static export files
+    const staticPath = path.join(__dirname, '..', 'client', 'out');
+    const indexPath = path.join(staticPath, 'index.html');
+
+    console.log(`📁 Looking for static files at: ${staticPath}`);
+    console.log(`📄 Looking for index file at: ${indexPath}`);
+
+    // Check if static export exists
+    const fs = require('fs');
+    if (fs.existsSync(staticPath)) {
+        console.log('✅ Static export directory found');
+
+        // Serve static files from Next.js export
+        app.use(express.static(staticPath));
+
+        // Handle all non-API routes - send to Next.js
+        app.get('*', (req, res) => {
+            // For API routes, return 404
+            if (req.path.startsWith('/api/')) {
+                return res.status(404).json({ message: 'API route not found' });
+            }
+
+            // For frontend routes, serve the appropriate HTML file
+            let filePath = req.path;
+
+            // Handle trailing slash for static export
+            if (filePath === '/') {
+                filePath = '/index.html';
+            } else if (!filePath.endsWith('.html') && !filePath.includes('.')) {
+                filePath = filePath + '/index.html';
+            }
+
+            const fullPath = path.join(staticPath, filePath);
+
+            if (fs.existsSync(fullPath)) {
+                res.sendFile(fullPath);
+            } else {
+                // Fallback to index.html for client-side routing
+                res.sendFile(indexPath);
+            }
+        });
+
+        console.log('✅ Static file serving configured for Next.js export');
+    } else {
+        console.error('❌ Static export not found. Expected directory:', staticPath);
+        console.error('💡 Make sure to run: npm run build in the client directory');
+
+        app.get('*', (req, res) => {
+            if (req.path.startsWith('/api/')) {
+                res.status(404).json({ message: 'API route not found' });
+            } else {
+                res.status(500).json({
+                    message: 'Frontend not available',
+                    error: 'Next.js static export not found',
+                    expectedPath: staticPath
+                });
+            }
+        });
+    }
 } else {
     // Fallback 404 for development
     app.use('*', (req, res) => {

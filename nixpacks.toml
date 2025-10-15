@@ -25,8 +25,11 @@ cmds = [
 # Server has no build step (runs directly with node)
 cmds = [
     "echo '🏗️  Building Next.js client application...'",
-    "npm run build --prefix ./client",
-    "echo '✅ Client build complete!'"
+    "cd client && npm run build",
+    "echo '✅ Client build complete!'",
+    "echo '📁 Checking build output...'",
+    "ls -la client/out || echo 'No out directory found'",
+    "ls -la client/.next || echo 'No .next directory found'"
 ]
 
 [start]
