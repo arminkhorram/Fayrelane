@@ -1,16 +1,28 @@
 'use client'
 
 import Link from 'next/link'
-import { XIcon, UserIcon, LogoutIcon, DashboardIcon, MessageIcon, SettingsIcon } from '@/components/Icons'
+import { LogoutIcon, DashboardIcon, MessageIcon, SettingsIcon } from '@/components/Icons'
 import { getInitials } from '@/lib/utils'
 
 interface MobileMenuProps {
     user: any
     navigation: Array<{ name: string; href: string }>
+    currentPath: string
     onClose: () => void
 }
 
-export function MobileMenu({ user, navigation, onClose }: MobileMenuProps) {
+const getLinkClasses = (href: string, currentPath: string) => {
+    const isActive = href === '/' ? currentPath === '/' : currentPath.startsWith(href)
+
+    return [
+        'block px-3 py-2 rounded-md text-base font-medium transition-colors',
+        isActive
+            ? 'text-primary-600'
+            : 'text-gray-700 hover:text-primary-600'
+    ].join(' ')
+}
+
+export function MobileMenu({ user, navigation, currentPath, onClose }: MobileMenuProps) {
     const handleLogout = () => {
         // Logout logic would be handled by parent component
         onClose()
@@ -25,7 +37,7 @@ export function MobileMenu({ user, navigation, onClose }: MobileMenuProps) {
                         key={item.name}
                         href={item.href}
                         onClick={onClose}
-                        className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium"
+                        className={getLinkClasses(item.href, currentPath)}
                     >
                         {item.name}
                     </Link>
