@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
-import { PlusIcon, CheckIcon } from '@/components/Icons'
+import { CheckIcon } from '@/components/Icons'
 
 const features = [
     'List unlimited automotive parts',
@@ -22,6 +22,8 @@ export default function SellPage() {
     const [isLoading, setIsLoading] = useState(false)
 
     const handleGetStarted = () => {
+        setIsLoading(true)
+
         if (!user) {
             router.push('/register?role=seller')
         } else {

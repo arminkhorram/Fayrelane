@@ -1,24 +1,36 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { SearchBar } from './SearchBar'
 import { UserMenu } from './UserMenu'
 import { MobileMenu } from './MobileMenu'
-import { CartIcon, MenuIcon, UserIcon } from '@/components/Icons'
+import { MenuIcon } from '@/components/Icons'
 
 export function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const { user, loading } = useAuth()
-    const router = useRouter()
+    const pathname = usePathname() || '/'
 
-    const navigation = [
+    const navigation = useMemo(() => ([
+        { name: 'Home', href: '/' },
         { name: 'Browse', href: '/listings' },
         { name: 'Categories', href: '/categories' },
         { name: 'Sell', href: '/sell' },
-    ]
+    ]), [])
+
+    const getLinkClasses = (href: string) => {
+        const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href)
+
+        return [
+            'px-3 py-2 rounded-md text-sm font-medium transition-colors',
+            isActive
+                ? 'text-primary-600'
+                : 'text-gray-700 hover:text-primary-600'
+        ].join(' ')
+    }
 
     return (
         <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -40,7 +52,7 @@ export function Header() {
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                                className={getLinkClasses(item.href)}
                             >
                                 {item.name}
                             </Link>
@@ -98,6 +110,7 @@ export function Header() {
                 <MobileMenu
                     user={user}
                     navigation={navigation}
+                    currentPath={pathname}
                     onClose={() => setMobileMenuOpen(false)}
                 />
             )}
